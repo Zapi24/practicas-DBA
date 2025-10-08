@@ -13,33 +13,20 @@ import jade.wrapper.ContainerController;
 import java.util.Scanner;
 
 /**
- * Clase principal que actúa como lanzador para el sistema de agentes JADE.
- * Se conecta al Main Container (servidor principal) y despliega los distintos agentes
  * * @author zapi24
  */
 public class Practica1DBA{
 
-    /**
-     * Punto de entrada para la ejecución del sistema de agentes.
-     * @param args los argumentos de la línea de comandos
-     */
     public static void main(String[] args){
         
         //1. Obtener la instancia del entorno de ejecución de JADE.
         Runtime rt = Runtime.instance();
 
-        // 2.Crear un Profile para el Contenedor de Agentes.
-        // Usamos un ProfileImpl vacío para conectar al Main Container por defecto (localhost:1099).
+        //2.Crear un Profile para el Contenedor de Agentes.
         Profile p = new ProfileImpl();
         
         Scanner sc = new Scanner(System.in);
         
-        //Configuraciones Opcionales (puedes descomentar si es necesario)
-        //Para conectar a un host diferente:
-        //p.setParameter(Profile.MAIN_HOST, "192.168.1.10"); 
-        //Para dar un nombre específico al nuevo contenedor:
-        //p.setParameter(Profile.CONTAINER_NAME, "ContenedorSecundario");
-
         System.out.println("--- Lanzador JADE ---");
 
         try{    //Se ejecutará si el contenedor esta abierto, o no ha habido algun otro error
@@ -59,6 +46,10 @@ public class Practica1DBA{
             System.out.println("3. Mensaje indefinido cada 2 segundos.");
             System.out.println("4. Muestra 'eco' 5 veces.");
             System.out.println("5. Muestra la media de los numeros dados.");
+            System.out.println("6. Prueba de tiempos con una carga de trabajo.");
+            System.out.println("7. Fichero de texto.");
+
+
 
             int opcion = sc.nextInt(); //leemos la opciones
             
@@ -72,23 +63,31 @@ public class Practica1DBA{
                     case 1:
                         agentClassName = "practica1dba.ejercicio1";
                         agentName = "AgenteEjercicio1";
-                        break;
+                    break;
                     case 2:
                         agentClassName = "practica1dba.ejercicio2";
                         agentName = "AgenteEjercicio2";
-                        break;
+                    break;
                     case 3:
                         agentClassName = "practica1dba.ejercicio3";
                         agentName = "AgenteEjercicio3";
-                        break;
+                    break;
                     case 4:
                         agentClassName = "practica1dba.ejercicio4";
                         agentName = "AgenteEjercicio4";
-                        break;
+                    break;
                     case 5:
-                        //Pendiente
-                        System.out.println("Ejercicio 5 pendiente de implementación.");
-                        return;
+                        agentClassName = "practica1dba.ejercicio5";
+                        agentName = "AgenteEjercicio5";
+                    break;
+                    case 6:
+                        agentClassName = "practica1dba.ejercicio6";
+                        agentName = "AgenteEjercicio6";
+                    break;
+                    case 7:
+                        agentClassName = "practica1dba.ejercicio7";
+                        agentName = "AgenteEjercicio7";
+                    break;
                     default:
                         System.out.println("Por favor, ingresa un valor válido entre 1 y 5.");
                         return; // Salir si la opción no es válida
@@ -103,7 +102,7 @@ public class Practica1DBA{
                         null                    // Argumentos (none)
                     );
 
-                    // 5. Iniciar la ejecución del agente.
+                    //5. Iniciar la ejecución del agente.
                     ac.start();
 
                     System.out.println("Agente '" + agentName + "' (clase " + agentClassName + ") lanzado exitosamente.");
