@@ -97,9 +97,9 @@ public class Practica1DBA{
                     
                     //4. Crear un nuevo Agente en el contenedor.
                     AgentController ac = cc.createNewAgent(
-                        agentName,              // Nombre del agente
-                        agentClassName,         // Clase completa del agente
-                        null                    // Argumentos (none)
+                        agentName,              //Nombre del agente
+                        agentClassName,         //Clase completa del agente
+                        null                    //Argumentos (none)
                     );
 
                     //5. Iniciar la ejecución del agente.

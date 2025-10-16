@@ -33,7 +33,7 @@ Para obtener el tiempo real vamos a someter uno comportamiento en el que estara 
 calculos o simplemente esperando durante un segundo y medio. Esto hara que el ticket se ejecute
 cada segundo en vez de cada segundo y medio. Ya que:
 
-Empiezan a ejectutarse ambos concurrentemente
+Empiezan a ejectutarse
 ---- 500 ms ---- ---- 500 ms ---- ---- 500 ms ---- 
 ---- 500 ms ----
 
@@ -80,28 +80,22 @@ public class ejercicio6 extends Agent{
             }
         });
         
-        //Comportamiento de "carga pesada"
+        //Comportamiento de "carga pesada", solo se ejecuta la primera vez
         addBehaviour(new OneShotBehaviour(this){
             
             @Override
             public void action(){
                 
                 System.out.println("Empiezo a generar carga pesada en: "+System.currentTimeMillis());
-                //!!NO FUNCIONA
+                //Hace que se retrase un segundo las ejecuciones
                 try{
                     
                     Thread.sleep(PERIODO_ESPERA);
                 }catch (InterruptedException ex){ //Netbeans me hizo esto
+                    
                     System.getLogger(ejercicio6.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
                 }
                 
-                //Codigo arreglado por el molegon:
-                /* inicioCarga = System.currentTimeMillis();
-                while (System.currentTimeMillis() - inicioCarga < PERIODO_ESPERA){  //Se queda esperando en el while el segundo y medio 
-                    // Simular trabajo intenso que no cede el control (operaciones matemáticas)
-                    double dummy = Math.sqrt(Math.random()); 
-                    dummy++; 
-                }*/
                 System.out.println("Acabo de generar carga pesada en: "+System.currentTimeMillis());
 
             }
