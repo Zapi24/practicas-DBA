@@ -28,28 +28,28 @@ public class EstrategiaManhattan implements EstrategiaMovimiento{
         //Vemos cual de los dos ejes es el que tiene mayor distancia
         if (Math.abs(valorY) > Math.abs(valorX)){
             
-            if (valorY > 0 && p.isSensorAbajoLibre()) return Movimiento.ABAJO;
-            if (valorY < 0 && p.isSensorArribaLibre()) return Movimiento.ARRIBA;
+            if (valorY > 0 && p.getSensorLibre().get(Movimiento.ABAJO)) return Movimiento.ABAJO;
+            if (valorY < 0 && p.getSensorLibre().get(Movimiento.ARRIBA)) return Movimiento.ARRIBA;
         }
 
         //Lo mismo pero con el movimiento horizontal
-        if (valorX > 0 && p.isSensorDerechaLibre()) return Movimiento.DERECHA;
-        if (valorX < 0 && p.isSensorIzquierdaLibre()) return Movimiento.IZQUIERDA;
+        if (valorX > 0 && p.getSensorLibre().get(Movimiento.DERECHA)) return Movimiento.DERECHA;
+        if (valorX < 0 && p.getSensorLibre().get(Movimiento.IZQUIERDA)) return Movimiento.IZQUIERDA;
         
         // --- Lógica anti-atasco (simple) ---
         // Si la ruta ideal está bloqueada, toma la primera salida libre
         // que no sea "hacia atrás" (si es posible).
         
-        if (p.isSensorAbajoLibre() && valorY <= 0) return Movimiento.ABAJO;
-        if (p.isSensorDerechaLibre() && valorX <= 0) return Movimiento.DERECHA;
-        if (p.isSensorArribaLibre() && valorY >= 0) return Movimiento.ARRIBA;
-        if (p.isSensorIzquierdaLibre() && valorX >= 0) return Movimiento.IZQUIERDA;
+        if (p.getSensorLibre().get(Movimiento.ABAJO) && valorY <= 0) return Movimiento.ABAJO;
+        if (p.getSensorLibre().get(Movimiento.DERECHA) && valorX <= 0) return Movimiento.DERECHA;
+        if (p.getSensorLibre().get(Movimiento.ARRIBA) && valorY >= 0) return Movimiento.ARRIBA;
+        if (p.getSensorLibre().get(Movimiento.IZQUIERDA) && valorX >= 0) return Movimiento.IZQUIERDA;
 
         //Si está totalmente rodeado (excepto por donde vino), vuelve.`l
-        if (p.isSensorAbajoLibre()) return Movimiento.ARRIBA;
-        if (p.isSensorArribaLibre()) return Movimiento.ABAJO;
-        if (p.isSensorDerechaLibre()) return Movimiento.DERECHA;
-        if (p.isSensorIzquierdaLibre()) return Movimiento.IZQUIERDA;
+        if (p.getSensorLibre().get(Movimiento.ARRIBA)) return Movimiento.ARRIBA;
+        if (p.getSensorLibre().get(Movimiento.ABAJO)) return Movimiento.ABAJO;
+        if (p.getSensorLibre().get(Movimiento.DERECHA)) return Movimiento.DERECHA;
+        if (p.getSensorLibre().get(Movimiento.IZQUIERDA)) return Movimiento.IZQUIERDA;
         
         return Movimiento.QUEDARSE; //Si esta completamente rodeado por que su posicion inicial es esa, pues no se puede mover 
     }

@@ -18,7 +18,7 @@ import java.util.StringTokenizer;
  */
 public class Mundo{ //Clase que cartga el mundo y almacena syu estado 
     
-        private int filas;
+    private int filas;
     private int columnas;
     private int[][] mapa; // -1 = Obstáculo, 0 = Libre
 
@@ -66,8 +66,14 @@ public class Mundo{ //Clase que cartga el mundo y almacena syu estado
         return mapa[y][x]; // [fila][columna] -> [y][x]
     }
 
-    public boolean isCeldaTransitable(int x, int y) {
+    public boolean isCeldaTransitable(int x, int y){
+        
         return isDentroDeLimites(x, y) && getValorCelda(x, y) == 0;
+    }
+    
+    public boolean isCeldaMuro(int x, int y){
+        
+        return getValorCelda(x,y) == -1;
     }
 
     public void imprimirMundo(Coordenada posAgente) {

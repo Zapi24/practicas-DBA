@@ -9,6 +9,8 @@ import practica2dba.utils.Movimiento;
 import practica2dba.utils.Percepcion;
 import practica2dba.utils.ResultadoAccion;
 
+import java.util.HashMap; 
+
 import java.io.IOException;
 
 /**
@@ -43,12 +45,23 @@ public class Entorno{   //Clase que se encarga de mediador entre el agente y el 
         int y = posicionAgente.getY();
 
         //Lo que tiene arriba, abajo,. izquierda y derecha
-        boolean arriba = mundo.isCeldaTransitable(x, y - 1);
-        boolean abajo = mundo.isCeldaTransitable(x, y + 1);
-        boolean izq = mundo.isCeldaTransitable(x - 1, y);
-        boolean der = mundo.isCeldaTransitable(x + 1, y);
+        HashMap<Movimiento,Boolean> sensorLibre = new HashMap<>();
+        HashMap<Movimiento,Boolean> sensorMuro = new HashMap<>();
+        
+        //Para ver si la celda es transitable
+        sensorLibre.put(Movimiento.ABAJO,mundo.isCeldaTransitable(x, y + 1));
+        sensorLibre.put(Movimiento.ARRIBA,mundo.isCeldaTransitable(x, y - 1));
+        sensorLibre.put(Movimiento.IZQUIERDA,mundo.isCeldaTransitable(x - 1 , y));
+        sensorLibre.put(Movimiento.DERECHA,mundo.isCeldaTransitable(x + 1 , y));
+        
+        //Para ver si es un muro
+        sensorMuro.put(Movimiento.ABAJO,mundo.isCeldaMuro(x, y + 1));
+        sensorMuro.put(Movimiento.ARRIBA,mundo.isCeldaMuro(x, y - 1));
+        sensorMuro.put(Movimiento.IZQUIERDA,mundo.isCeldaMuro(x - 1 , y));
+        sensorMuro.put(Movimiento.DERECHA,mundo.isCeldaMuro(x + 1 , y));
+        
 
-        return new Percepcion(new Coordenada(x, y), bateriaRestante, arriba, abajo, izq, der);
+        return new Percepcion(new Coordenada(x, y), bateriaRestante, sensorLibre, sensorMuro);
     }
 
     //Se encarga de ejecutar el movimiento deseado
