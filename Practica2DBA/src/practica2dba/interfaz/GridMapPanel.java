@@ -4,14 +4,16 @@ import practica2dba.utils.Coordenada;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
+/**
+ * Panel que muestra visualmente el mapa, el agente y el objetivo.
+ * Se adapta automáticamente al tamaño de la ventana (responsive).
+ */
 public class GridMapPanel extends JPanel {
 
     private int[][] mapa;
     private Coordenada agente;
     private Coordenada objetivo;
-    private int cellSize = 40; // tamaño de cada celda
     private int padding = 2;
     private boolean showGrid = true;
 
@@ -19,10 +21,10 @@ public class GridMapPanel extends JPanel {
         this.mapa = mapa;
         this.agente = agente;
         this.objetivo = objetivo;
-        setPreferredSize(new Dimension(mapa[0].length * cellSize, mapa.length * cellSize));
         setBackground(Color.WHITE);
     }
 
+    // ---- Setters dinámicos ----
     public void setAgente(Coordenada agente) {
         this.agente = agente;
         repaint();
@@ -43,18 +45,31 @@ public class GridMapPanel extends JPanel {
         repaint();
     }
 
+    // ---- Recalcula tamaño según el espacio disponible ----
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         if (mapa == null) return;
 
-        for (int y = 0; y < mapa.length; y++) {
-            for (int x = 0; x < mapa[0].length; x++) {
-                int valor = mapa[y][x];
-                int px = x * cellSize + padding;
-                int py = y * cellSize + padding;
+        int filas = mapa.length;
+        int columnas = mapa[0].length;
 
+        // 🔹 Cálculo del tamaño de celda según el tamaño actual del panel
+        int cellWidth = getWidth() / columnas;
+        int cellHeight = getHeight() / filas;
+        int cellSize = Math.min(cellWidth, cellHeight);
+
+        // 🔹 Centramos el mapa si sobra espacio
+        int offsetX = (getWidth() - (cellSize * columnas)) / 2;
+        int offsetY = (getHeight() - (cellSize * filas)) / 2;
+
+        for (int y = 0; y < filas; y++) {
+            for (int x = 0; x < columnas; x++) {
+                int valor = mapa[y][x];
+                int px = offsetX + x * cellSize + padding;
+                int py = offsetY + y * cellSize + padding;
+
+                // Color según tipo de celda
                 if (valor == -1) {
                     g.setColor(Color.DARK_GRAY); // obstáculo
                 } else {
@@ -63,7 +78,6 @@ public class GridMapPanel extends JPanel {
 
                 g.fillRect(px, py, cellSize - padding * 2, cellSize - padding * 2);
 
-                // Dibuja rejilla si está activada
                 if (showGrid) {
                     g.setColor(Color.GRAY);
                     g.drawRect(px, py, cellSize - padding * 2, cellSize - padding * 2);
@@ -71,20 +85,39 @@ public class GridMapPanel extends JPanel {
             }
         }
 
-        // Dibuja el objetivo
+        // 🔹 Dibuja el objetivo
         if (objetivo != null) {
+            int gx = offsetX + objetivo.getX() * cellSize + cellSize / 4;
+            int gy = offsetY + objetivo.getY() * cellSize + cellSize / 4;
+            int size = cellSize / 2;
+
             g.setColor(Color.GREEN);
-            g.fillOval(objetivo.getX() * cellSize + cellSize / 4,
-                       objetivo.getY() * cellSize + cellSize / 4,
-                       cellSize / 2, cellSize / 2);
+            g.fillOval(gx, gy, size, size);
         }
 
-        // Dibuja el agente
+        // 🔹 Dibuja el agente
         if (agente != null) {
+            int ax = offsetX + agente.getX() * cellSize + cellSize / 4;
+            int ay = offsetY + agente.getY() * cellSize + cellSize / 4;
+            int size = cellSize / 2;
+
             g.setColor(Color.RED);
-            g.fillOval(agente.getX() * cellSize + cellSize / 4,
-                       agente.getY() * cellSize + cellSize / 4,
-                       cellSize / 2, cellSize / 2);
+            g.fillOval(ax, ay, size, size);
         }
+    }
+
+    // ---- Tamaño preferido adaptable ----
+    @Override
+    public Dimension getPreferredSize() {
+        if (mapa == null) return new Dimension(600, 600);
+
+        int filas = mapa.length;
+        int columnas = mapa[0].length;
+
+        // 🔹 Tamaño base entre 400 y 800 px, adaptable al nº de celdas
+        int baseSize = Math.min(800, Math.max(400, Math.max(filas, columnas) * 15));
+
+        // Mantiene proporción cuadrada (importante para que no se deforme)
+        return new Dimension(baseSize, baseSize);
     }
 }
