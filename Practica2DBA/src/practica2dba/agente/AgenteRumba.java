@@ -12,10 +12,13 @@ package practica2dba.agente;
 import practica2dba.entorno.Entorno;
 import practica2dba.estrategia.EstrategiaManhattan;
 import practica2dba.estrategia.EstrategiaMovimiento;
+import practica2dba.interfaz.VentanaPrincipal;
 import practica2dba.utils.Coordenada;
 import practica2dba.utils.Movimiento;
 import practica2dba.utils.Percepcion;
 import practica2dba.utils.ResultadoAccion;
+
+import javax.swing.SwingUtilities;
 
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -26,6 +29,8 @@ public class AgenteRumba extends Agent{
     private Entorno entorno;
     private Coordenada objetivo;
     private EstrategiaMovimiento estrategia;
+    private practica2dba.interfaz.VentanaPrincipal ventana;
+
     
     @Override
     protected void setup(){
@@ -55,6 +60,16 @@ public class AgenteRumba extends Agent{
                 this.entorno = new Entorno(rutaMapa, new Coordenada(x_ini, y_ini), bateriaMax);
                 this.estrategia = new EstrategiaManhattan();
 
+                // Crear interfaz gráfica
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    ventana = new VentanaPrincipal(
+                        entorno.getMundo().getMapa(),
+                        entorno.getPosicionActual(),
+                        objetivo
+                    );
+                });
+
+
                 System.out.println("Configuración: Inicio (" + x_ini + "," + y_ini + "), Objetivo (" + x_obj + "," + y_obj + ")");
                 System.out.println("Batería Máxima: " + bateriaMax);
                 System.out.println("Estrategia usada: " + estrategia.getClass().getSimpleName());
@@ -64,7 +79,7 @@ public class AgenteRumba extends Agent{
                 entorno.imprimirMundoActual();
 
                 //Vamos ejecutando el ciclo
-                addBehaviour(new TickerBehaviour(this, 200) {
+                addBehaviour(new TickerBehaviour(this, 500) {
                     @Override
                     protected void onTick() {
                         ejecutarCiclo();
@@ -99,6 +114,13 @@ public class AgenteRumba extends Agent{
         //3. ACCIÓN (delegada al Entorno)
         System.out.println("DECISIÓN: Mover -> " + proximoMovimiento);
         ResultadoAccion resultado = entorno.ejecutarAccion(proximoMovimiento);
+        // Actualizar interfaz con la nueva posición
+        if (ventana != null) {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                ventana.actualizar(entorno.getPosicionActual());
+            });
+        }
+
 
         //4. VALIDACIÓN
         switch (resultado){
@@ -131,6 +153,7 @@ public class AgenteRumba extends Agent{
                 }
                 break;
         }
+
     }
 
     //Metodo para detener al agente

@@ -100,4 +100,8 @@ public class Entorno{   //Clase que se encarga de mediador entre el agente y el 
         mundo.imprimirMundo(posicionAgente);
     }
     
+    public Mundo getMundo() {
+        return this.mundo;
+    }
+
 }

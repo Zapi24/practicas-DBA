@@ -89,5 +89,10 @@ public class Mundo{ //Clase que cartga el mundo y almacena syu estado
             System.out.println();
         }
     }
+
+    public int[][] getMapa() {
+        return mapa;
+    }
+
     
 }
