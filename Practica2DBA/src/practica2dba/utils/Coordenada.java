@@ -34,11 +34,24 @@ public class Coordenada{
 
     //Para poder comparar la entradas
     @Override
-    public boolean equals(Object obj){ //(Tengo que revisar que hace, esta funcion me la hizo el colegon)
+    public boolean equals(Object obj){ 
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Coordenada that = (Coordenada) obj;
         return x == that.x && y == that.y;
+    }
+   
+    /*
+        He tenido que añadir esto por que por lo visto cuando tenemos un HashMap con <Coordenada,..>
+        Para que java trate como unicas las claves y no cree una nueva direccion de memoria
+        cada vez que consultamos el HashMap con la misma clave tenemos que añadirlo. Si no lo que 
+        hara java es tener una direccion de memoria diferente para el mismo objeto cada vez que 
+        consulte o tratemos al objeto del HashMap con coordenada (2,5) por ejemplo.
+    */
+    @Override
+    public int hashCode(){
+        // java.util.Objects.hash es la forma moderna y segura de generar un hashCode
+        return java.util.Objects.hash(x, y);
     }
 }
 

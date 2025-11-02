@@ -11,6 +11,8 @@ package practica2dba.agente;
 
 import practica2dba.entorno.Entorno;
 import practica2dba.estrategia.EstrategiaManhattan;
+import practica2dba.estrategia.MiHa_estrategia;
+import practica2dba.estrategia.EstrategiaZapi;
 import practica2dba.estrategia.EstrategiaMovimiento;
 import practica2dba.interfaz.VentanaPrincipal;
 import practica2dba.utils.Coordenada;
@@ -58,7 +60,7 @@ public class AgenteRumba extends Agent{
                 //Una vez obtenido todos los datos, define las variables del agente
                 this.objetivo = new Coordenada(x_obj, y_obj);
                 this.entorno = new Entorno(rutaMapa, new Coordenada(x_ini, y_ini), bateriaMax);
-                this.estrategia = new EstrategiaManhattan();
+                this.estrategia = new EstrategiaZapi();
 
                 // Crear interfaz gráfica
                 javax.swing.SwingUtilities.invokeLater(() -> {
@@ -79,7 +81,7 @@ public class AgenteRumba extends Agent{
                 entorno.imprimirMundoActual();
 
                 //Vamos ejecutando el ciclo
-                addBehaviour(new TickerBehaviour(this, 500) {
+                addBehaviour(new TickerBehaviour(this, 100){
                     @Override
                     protected void onTick() {
                         ejecutarCiclo();

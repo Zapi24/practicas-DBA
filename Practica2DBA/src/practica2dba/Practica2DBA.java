@@ -34,12 +34,12 @@ public class Practica2DBA {
             // Argumentos del Agente:
             // (x_ini, y_ini, x_obj, y_obj, bateria_max, ruta_mapa)
             Object[] agentArgs = new Object[] {
-                0,                          //x_ini
-                0,                          //y_ini
-                9,                          //x_obj
-                9,                          //y_obj
-                100,                        //Batería máxima
-                "maps/mapWithHorizontalWall.txt"     //Ruta del mapa
+                37,                          //x_ini
+                32,                          //y_ini
+                0,                          //x_obj
+                0,                          //y_obj
+                300,                        //Batería máxima
+                "maps/mapWithComplexObstacle4.txt"     //Ruta del mapa
             };
             
             //Lanzamos el AgenteRumba desde su nuevo paquete

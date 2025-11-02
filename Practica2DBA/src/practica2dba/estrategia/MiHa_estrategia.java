@@ -45,10 +45,10 @@ public class MiHa_estrategia implements EstrategiaMovimiento {
     private void atualizarMemoria(Coordenada atual, Percepcion p) {
         // Atualiza o mapa conhecido com os sensores
         mapaConhecido.put(atual, true);
-        mapaConhecido.put(new Coordenada(atual.getX(), atual.getY() - 1), p.isSensorArribaLibre());
-        mapaConhecido.put(new Coordenada(atual.getX(), atual.getY() + 1), p.isSensorAbajoLibre());
-        mapaConhecido.put(new Coordenada(atual.getX() - 1, atual.getY()), p.isSensorIzquierdaLibre());
-        mapaConhecido.put(new Coordenada(atual.getX() + 1, atual.getY()), p.isSensorDerechaLibre());
+        mapaConhecido.put(new Coordenada(atual.getX(), atual.getY() - 1), p.getSensorLibre().get(Movimiento.ARRIBA));
+        mapaConhecido.put(new Coordenada(atual.getX(), atual.getY() + 1), p.getSensorLibre().get(Movimiento.ABAJO));
+        mapaConhecido.put(new Coordenada(atual.getX() - 1, atual.getY()), p.getSensorLibre().get(Movimiento.IZQUIERDA));
+        mapaConhecido.put(new Coordenada(atual.getX() + 1, atual.getY()), p.getSensorLibre().get(Movimiento.DERECHA));
         
         // Adiciona a posição atual às visitadas e ao histórico recente
         celulasVisitadas.add(atual);
@@ -143,10 +143,10 @@ public class MiHa_estrategia implements EstrategiaMovimiento {
         if (caminhoCalculado.isEmpty()) return false;
         Movimiento proximoMovimento = caminhoCalculado.peek();
         switch (proximoMovimento) {
-            case ARRIBA: return !p.isSensorArribaLibre();
-            case ABAJO: return !p.isSensorAbajoLibre();
-            case IZQUIERDA: return !p.isSensorIzquierdaLibre();
-            case DERECHA: return !p.isSensorDerechaLibre();
+            case ARRIBA: return !p.getSensorLibre().get(Movimiento.ARRIBA);
+            case ABAJO: return !p.getSensorLibre().get(Movimiento.ABAJO);
+            case IZQUIERDA: return !p.getSensorLibre().get(Movimiento.IZQUIERDA);
+            case DERECHA: return !p.getSensorLibre().get(Movimiento.DERECHA);
             default: return false;
         }
     }
@@ -155,15 +155,15 @@ public class MiHa_estrategia implements EstrategiaMovimiento {
         Coordenada atual = p.getPosicionActual();
         Coordenada posAnterior = historicoRecente.size() > 1 ? historicoRecente.get(1) : null;
         
-        if (p.isSensorArribaLibre() && !new Coordenada(atual.getX(), atual.getY() - 1).equals(posAnterior)) return Movimiento.ARRIBA;
-        if (p.isSensorDerechaLibre() && !new Coordenada(atual.getX() + 1, atual.getY()).equals(posAnterior)) return Movimiento.DERECHA;
-        if (p.isSensorAbajoLibre() && !new Coordenada(atual.getX(), atual.getY() + 1).equals(posAnterior)) return Movimiento.ABAJO;
-        if (p.isSensorIzquierdaLibre() && !new Coordenada(atual.getX() - 1, atual.getY()).equals(posAnterior)) return Movimiento.IZQUIERDA;
+        if (p.getSensorLibre().get(Movimiento.ARRIBA) && !new Coordenada(atual.getX(), atual.getY() - 1).equals(posAnterior)) return Movimiento.ARRIBA;
+        if (p.getSensorLibre().get(Movimiento.DERECHA) && !new Coordenada(atual.getX() + 1, atual.getY()).equals(posAnterior)) return Movimiento.DERECHA;
+        if (p.getSensorLibre().get(Movimiento.ABAJO) && !new Coordenada(atual.getX(), atual.getY() + 1).equals(posAnterior)) return Movimiento.ABAJO;
+        if (p.getSensorLibre().get(Movimiento.IZQUIERDA) && !new Coordenada(atual.getX() - 1, atual.getY()).equals(posAnterior)) return Movimiento.IZQUIERDA;
         
-        if (p.isSensorArribaLibre()) return Movimiento.ARRIBA;
-        if (p.isSensorDerechaLibre()) return Movimiento.DERECHA;
-        if (p.isSensorAbajoLibre()) return Movimiento.ABAJO;
-        if (p.isSensorIzquierdaLibre()) return Movimiento.IZQUIERDA;
+        if (p.getSensorLibre().get(Movimiento.ARRIBA)) return Movimiento.ARRIBA;
+        if (p.getSensorLibre().get(Movimiento.DERECHA)) return Movimiento.DERECHA;
+        if (p.getSensorLibre().get(Movimiento.ABAJO)) return Movimiento.ABAJO;
+        if (p.getSensorLibre().get(Movimiento.IZQUIERDA)) return Movimiento.IZQUIERDA;
         
         return Movimiento.QUEDARSE;
     }

@@ -1,1 +1,1 @@
-( ap-description  :name "dba_server" :ap-services (set ( ap-service  :name fipa.mts.mtp.http.std :type fipa.mts.mtp.http.std :addresses (sequence http://172.17.2.68:7778/acc))))
+( ap-description  :name "dba_server" :ap-services (set ( ap-service  :name fipa.mts.mtp.http.std :type fipa.mts.mtp.http.std :addresses (sequence http://zapi24-GF63-Thin-9SC:7778/acc))))
