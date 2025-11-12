@@ -13,6 +13,7 @@ import practica2dba.entorno.Entorno;
 import practica2dba.estrategia.EstrategiaManhattan;
 import practica2dba.estrategia.MiHa_estrategia;
 import practica2dba.estrategia.EstrategiaZapi;
+import practica2dba.estrategia.EstrategiaNat;
 import practica2dba.estrategia.EstrategiaMovimiento;
 import practica2dba.interfaz.VentanaPrincipal;
 import practica2dba.utils.Coordenada;
@@ -60,7 +61,7 @@ public class AgenteRumba extends Agent{
                 //Una vez obtenido todos los datos, define las variables del agente
                 this.objetivo = new Coordenada(x_obj, y_obj);
                 this.entorno = new Entorno(rutaMapa, new Coordenada(x_ini, y_ini), bateriaMax);
-                this.estrategia = new EstrategiaZapi();
+                this.estrategia = new EstrategiaNat();
 
                 // Crear interfaz gráfica
                 javax.swing.SwingUtilities.invokeLater(() -> {

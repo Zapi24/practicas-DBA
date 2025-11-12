@@ -36,8 +36,8 @@ public class Practica2DBA {
             Object[] agentArgs = new Object[] {
                 37,                          //x_ini
                 32,                          //y_ini
-                0,                          //x_obj
-                0,                          //y_obj
+                5,                          //x_obj
+                30,                          //y_obj
                 300,                        //Batería máxima
                 "maps/mapWithComplexObstacle4.txt"     //Ruta del mapa
             };
