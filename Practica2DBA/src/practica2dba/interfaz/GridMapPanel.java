@@ -91,7 +91,7 @@ public class GridMapPanel extends JPanel {
             int gy = offsetY + objetivo.getY() * cellSize + cellSize / 4;
             int size = cellSize / 2;
 
-            g.setColor(Color.GREEN);
+            g.setColor(Color.RED);
             g.fillOval(gx, gy, size, size);
         }
 
@@ -101,7 +101,7 @@ public class GridMapPanel extends JPanel {
             int ay = offsetY + agente.getY() * cellSize + cellSize / 4;
             int size = cellSize / 2;
 
-            g.setColor(Color.RED);
+            g.setColor(Color.BLUE);
             g.fillOval(ax, ay, size, size);
         }
     }

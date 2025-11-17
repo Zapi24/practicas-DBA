@@ -13,7 +13,6 @@ import java.util.HashMap;   //Como un map pero mas eficiente
 public class Percepcion{    //Clase que encapsula toda la informacion del entorno que el agente puede conocer
     
     private Coordenada posicionActual;
-    private int bateriaRestante;    //Valor limite para que el programa tenga un final si se queda atascadoí
     
     //Para que el agente sepa si sus casillas adyacentes son libres
     HashMap<Movimiento,Boolean> sensorLibre = new HashMap<>();  
@@ -22,10 +21,9 @@ public class Percepcion{    //Clase que encapsula toda la informacion del entorn
     HashMap<Movimiento,Boolean> sensorMuro = new HashMap<>();
     
 
-    public Percepcion(Coordenada pos, int bat, HashMap<Movimiento,Boolean> libre, HashMap<Movimiento,Boolean> muro){
+    public Percepcion(Coordenada pos, HashMap<Movimiento,Boolean> libre, HashMap<Movimiento,Boolean> muro){
         
         this.posicionActual = pos;
-        this.bateriaRestante = bat;
                 
         //Inicializamos los sensores
         this.sensorLibre = libre;
@@ -36,7 +34,6 @@ public class Percepcion{    //Clase que encapsula toda la informacion del entorn
 
     //Aqui estan los getters
     public Coordenada getPosicionActual() { return posicionActual; }
-    public int getBateriaRestante() { return bateriaRestante; }
     
     public HashMap<Movimiento,Boolean> getSensorLibre(){return sensorLibre;}
     public HashMap<Movimiento,Boolean> getSensorMuro(){return sensorMuro;}

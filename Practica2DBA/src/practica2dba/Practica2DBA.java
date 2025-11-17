@@ -32,14 +32,13 @@ public class Practica2DBA {
             ContainerController cc = rt.createAgentContainer(p);
             
             // Argumentos del Agente:
-            // (x_ini, y_ini, x_obj, y_obj, bateria_max, ruta_mapa)
+            // (x_ini, y_ini, x_obj, y_obj, ruta_mapa)
             Object[] agentArgs = new Object[] {
-                37,                          //x_ini
-                32,                          //y_ini
-                5,                          //x_obj
-                30,                          //y_obj
-                300,                        //Batería máxima
-                "maps/mapWithComplexObstacle4.txt"     //Ruta del mapa
+                24,                          //x_ini
+                31,                          //y_ini
+                25,                          //x_obj
+                34,                          //y_obj
+                "mapsDefensa/mapComplex6.txt"     //Ruta del mapa
             };
             
             //Lanzamos el AgenteRumba desde su nuevo paquete

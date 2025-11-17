@@ -37,10 +37,10 @@ public class EstrategiaZapi implements EstrategiaMovimiento{
 
         //2º Vemos que movimientos son accesibles para el agente
         List<Movimiento> movimientosPosibles = new ArrayList<>();
-        if(p.getSensorLibre().get(Movimiento.ARRIBA))    movimientosPosibles.add(Movimiento.ARRIBA);
-        if(p.getSensorLibre().get(Movimiento.ABAJO))     movimientosPosibles.add(Movimiento.ABAJO);
+        if(p.getSensorLibre().get(Movimiento.ARRIBA)) movimientosPosibles.add(Movimiento.ARRIBA);
+        if(p.getSensorLibre().get(Movimiento.ABAJO)) movimientosPosibles.add(Movimiento.ABAJO);
+        if(p.getSensorLibre().get(Movimiento.DERECHA)) movimientosPosibles.add(Movimiento.DERECHA);
         if(p.getSensorLibre().get(Movimiento.IZQUIERDA)) movimientosPosibles.add(Movimiento.IZQUIERDA);
-        if(p.getSensorLibre().get(Movimiento.DERECHA))   movimientosPosibles.add(Movimiento.DERECHA);
 
         //3º Si no hay movimientos posibles (deberia ser una situacion imposible)
         if (movimientosPosibles.isEmpty()){

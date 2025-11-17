@@ -21,13 +21,11 @@ public class Entorno{   //Clase que se encarga de mediador entre el agente y el 
     
     private Mundo mundo;
     private Coordenada posicionAgente;
-    private int bateriaRestante;
 
-    public Entorno(String rutaMapa, Coordenada posInicial, int bateriaMax) throws IOException{
+    public Entorno(String rutaMapa, Coordenada posInicial) throws IOException{
         
         this.mundo = new Mundo(rutaMapa);   //Carga el mapa
         this.posicionAgente = posInicial;   //Establece la posicion inicial del agente
-        this.bateriaRestante = bateriaMax;  //Establece la bateria del agente
         
         //Por si la casilla inicial la hemos puesto mal
         if(!mundo.isCeldaTransitable(posInicial.getX(), posInicial.getY())){
@@ -35,7 +33,6 @@ public class Entorno{   //Clase que se encarga de mediador entre el agente y el 
             throw new IllegalArgumentException("La posición inicial (" + posInicial + ") es un obstáculo o está fuera de límites.");
         }
     }
-
 
     //Simula los sensores del agente, esta es la informacion que obtiene el agente
     public Percepcion getPercepcionActual(){
@@ -61,20 +58,12 @@ public class Entorno{   //Clase que se encarga de mediador entre el agente y el 
         sensorMuro.put(Movimiento.DERECHA,mundo.isCeldaMuro(x + 1 , y));
         
 
-        return new Percepcion(new Coordenada(x, y), bateriaRestante, sensorLibre, sensorMuro);
+        return new Percepcion(new Coordenada(x, y), sensorLibre, sensorMuro);
     }
 
     //Se encarga de ejecutar el movimiento deseado
     public ResultadoAccion ejecutarAccion(Movimiento mov){
         
-        //Marcamos como final si hemos consumido toda la bateria
-        if(this.bateriaRestante <= 0){
-            
-            return ResultadoAccion.DERROTA_BATERIA;
-        }
-        
-        //Actualizamos al valor de la bateri
-        this.bateriaRestante--;
 
         //Obtenemos la posicion nueva del agente
         Coordenada nuevaPos = new Coordenada(posicionAgente.getX(), posicionAgente.getY());
@@ -104,9 +93,6 @@ public class Entorno{   //Clase que se encarga de mediador entre el agente y el 
     //Para opbtener la posicion actual del agente
     public Coordenada getPosicionActual(){return this.posicionAgente;}
     
-    //Para opbtener la bateria actual del agente
-    public int getBateriaRestante(){return this.bateriaRestante;}
-
     //Para ir imprimiento el mundo
     public void imprimirMundoActual(){
         

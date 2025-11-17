@@ -11,7 +11,7 @@ package practica2dba.agente;
 
 import practica2dba.entorno.Entorno;
 import practica2dba.estrategia.EstrategiaManhattan;
-import practica2dba.estrategia.MiHa_estrategia;
+import practica2dba.estrategia.MiHa_estrategia6;
 import practica2dba.estrategia.EstrategiaZapi;
 import practica2dba.estrategia.EstrategiaNat;
 import practica2dba.estrategia.EstrategiaMovimiento;
@@ -20,8 +20,6 @@ import practica2dba.utils.Coordenada;
 import practica2dba.utils.Movimiento;
 import practica2dba.utils.Percepcion;
 import practica2dba.utils.ResultadoAccion;
-
-import javax.swing.SwingUtilities;
 
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -42,7 +40,7 @@ public class AgenteRumba extends Agent{
 
         try{
             Object[] args = getArguments();
-            if (args != null && args.length == 6){  //Obtiene los argumentos asociados al agente
+            if (args != null && args.length == 5){  //Obtiene los argumentos asociados al agente
                 
                 //Pos inicial
                 int x_ini = (int) args[0];
@@ -52,15 +50,13 @@ public class AgenteRumba extends Agent{
                 int x_obj = (int) args[2];
                 int y_obj = (int) args[3];
                 
-                //Bateria max
-                int bateriaMax = (int) args[4];
-                
                 //Ruta del archivo del mapa
-                String rutaMapa = (String) args[5];
+                String rutaMapa = (String) args[4];
 
                 //Una vez obtenido todos los datos, define las variables del agente
                 this.objetivo = new Coordenada(x_obj, y_obj);
-                this.entorno = new Entorno(rutaMapa, new Coordenada(x_ini, y_ini), bateriaMax);
+                this.entorno = new Entorno(rutaMapa, new Coordenada(x_ini, y_ini));
+                
                 this.estrategia = new EstrategiaNat();
 
                 // Crear interfaz gráfica
@@ -74,7 +70,6 @@ public class AgenteRumba extends Agent{
 
 
                 System.out.println("Configuración: Inicio (" + x_ini + "," + y_ini + "), Objetivo (" + x_obj + "," + y_obj + ")");
-                System.out.println("Batería Máxima: " + bateriaMax);
                 System.out.println("Estrategia usada: " + estrategia.getClass().getSimpleName());
 
                 //Imrpimimos el estado icicial del mundo
@@ -91,7 +86,7 @@ public class AgenteRumba extends Agent{
 
             }else{
                 
-                System.err.println("Error: Argumentos incorrectos. (Se esperaban 6)");
+                System.err.println("Error: Argumentos incorrectos. (Se esperaban 5)");
                 doDelete();
             }
         }catch(Exception e){
@@ -108,7 +103,6 @@ public class AgenteRumba extends Agent{
         Percepcion percepcion = entorno.getPercepcionActual();
         
         System.out.println("-------------------------------------");
-        System.out.println("Ciclo. Batería restante: " + entorno.getBateriaRestante());
         System.out.println("Posición actual: " + percepcion.getPosicionActual());
 
         //2. DECISIÓN (delegada a la Estrategia)
@@ -140,11 +134,7 @@ public class AgenteRumba extends Agent{
                 System.err.println("¡DERROTA! El agente intentó un movimiento inválido (obstáculo o límite).");
                 stopTicker();
                 break;
-            case DERROTA_BATERIA:
-                
-                System.err.println("¡DERROTA! Batería agotada.");
-                stopTicker();
-                break;
+
             case MOVIMIENTO_VALIDO:
                 
                 System.out.println("Acción ejecutada. Nueva posición: " + entorno.getPosicionActual());
