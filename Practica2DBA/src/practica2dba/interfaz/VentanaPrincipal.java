@@ -83,6 +83,7 @@ public class VentanaPrincipal extends JFrame {
         
         String[] mapasDisponibles = listarMapas();
         cmbMapas = new JComboBox<>(mapasDisponibles);
+        cmbMapas.setSelectedItem("maps/mapWithComplexObstacle1.txt");
         c.gridx = 1; c.gridy = 0; c.gridwidth = 3; 
         p.add(cmbMapas, c);
         
