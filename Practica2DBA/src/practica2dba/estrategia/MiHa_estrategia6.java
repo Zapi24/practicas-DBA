@@ -8,20 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-/**
- * @author zapi24 (Modificado com sugestão do user e IA)
- *
- * Nome da Estratégia: MiHa_estrategia6 (Timer Contínuo + Correções)
- *
- * 1. MODO BUSCA (Longe):
- * - Timer de 15 passos na parede.
- * - CORREÇÃO: Conta jogadas na parede MESMO QUE HAJA CURVA.
- * - Só reseta se largar a parede.
- *
- * 2. MODO FINAL (Perto, Raio 5):
- * - Lógica de Prioridade.
- * - Regra de Canto: Se sair da parede, tenta virar à direita na 1ª jogada.
- */
 public class MiHa_estrategia6 implements EstrategiaMovimiento {
 
     // --- Penalizações ---
@@ -34,26 +20,25 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
     
     private static final int BONUS_CURVA_ESQUINA = -5000;
 
-    // --- Timer (Modo Busca) ---
+    // --- Variáveis de Estado ---
     private static final int JOGADAS_NA_PAREDE_TOTAL = 15; 
-    private int contadorJogadasNaParede = 0; // Contador contínuo
+    private int contadorJogadasNaParede = 0;
     
-    // --- Raio (Modo Final) ---
     private static final int DISTANCIA_RAIO_FINAL = 5;
     private boolean modoFinalAtivado = false;
     private Movimiento direcaoGeralObjetivo = null;
     
-    // --- Variável para a regra de Canto (Modo Final) ---
     private int contadorJogadasSemParede_Modo2 = 0; 
+    private boolean pertoDaParede_Modo2 = false; 
 
-    // --- Checks (Modo Final) ---
+    // --- Checks Modo Final ---
     private boolean esquerdaCheck = false;
     private boolean direitaCheck = false;
     private int contadorOpostoEsquerda = 0;
     private int contadorOpostoDireita = 0;
     private HashMap<Coordenada, Integer> mapaVisitas_ModoFinal = new HashMap<>();
 
-    // --- Memórias (Globais) ---
+    // --- Memórias ---
     private HashMap<Coordenada, Integer> mapaDeVisitas_Celula = new HashMap<>();
     private HashMap<Coordenada, HashMap<Movimiento, Integer>> mapaDeVisitas_Acao = new HashMap<>();
     private Coordenada ultimaPosicao = null;
@@ -66,7 +51,7 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
         Coordenada actual = p.getPosicionActual();
         double distAtual = calcularDistanciaManhattan(actual, objetivo);
 
-        // 1. GATILHO MODO FINAL
+        // 1. Gatilho Modo Final
         boolean raioAux = (distAtual <= DISTANCIA_RAIO_FINAL);
         if (!modoFinalAtivado && raioAux) {
             Movimiento direcao = calcularDirecaoGeral(actual, objetivo, p);
@@ -83,7 +68,7 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             }
         }
         
-        // 2. ATUALIZA MEMÓRIAS
+        // 2. Atualizar Memórias
         mapaDeVisitas_Celula.put(actual, mapaDeVisitas_Celula.getOrDefault(actual, 0) + 1);
         if (ultimoMovimientoDecidido != null && ultimaPosicao != null) { 
             HashMap<Movimiento, Integer> acoesDaUltimaPosicao = 
@@ -93,7 +78,7 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             mapaDeVisitas_Acao.put(ultimaPosicao, acoesDaUltimaPosicao);
         }
 
-        // 3. ESCOLHE CÉREBRO
+        // 3. Escolher Cérebro
         Movimiento mejorMovimiento;
         System.out.println("  > Raio Final Ativo: " + this.modoFinalAtivado);
         
@@ -103,7 +88,7 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             mejorMovimiento = decidirMovimento_ModoBusca(p, objetivo, actual);
         }
 
-        // 4. ATUALIZA ESTADO
+        // 4. Atualizar Estado
         this.ultimaPosicao = actual;
         this.ultimoMovimientoDecidido = mejorMovimiento;
         return mejorMovimiento;
@@ -118,8 +103,6 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
         boolean haParedes = haParedes(p);
         Movimiento mejorMovimiento = null;
         double minCustoTotal = Double.MAX_VALUE;
-        
-        // Verifica se o timer já excedeu o limite
         boolean podeSairDaParede = (contadorJogadasNaParede > JOGADAS_NA_PAREDE_TOTAL);
 
         System.out.println("  > [BUSCA] Timer Parede: " + contadorJogadasNaParede + "/" + JOGADAS_NA_PAREDE_TOTAL + " (Pode Sair: " + podeSairDaParede + ")");
@@ -144,7 +127,7 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             }
         }
         
-        atualizarTimer(haParedes); // Atualização simplificada
+        atualizarTimer(haParedes);
         return mejorMovimiento;
     }
 
@@ -153,25 +136,22 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
     private Movimiento decidirMovimento_ModoFinal(Percepcion p, Coordenada objetivo, Coordenada actual) {
         
         boolean haParedes = haParedes(p);
-
-        // --- LÓGICA DE CURVA DE CANTO ---
-        boolean forcarCurvaDireita = false;
+        atualizarContadorParede_Modo2(haParedes); // <-- MÉTODO RESTAURADO AQUI
+        boolean ignoraManhattan = this.pertoDaParede_Modo2;
         
+        boolean forcarCurvaDireita = false;
         if (haParedes) {
             this.contadorJogadasSemParede_Modo2 = 0; 
         } else {
             this.contadorJogadasSemParede_Modo2++; 
         }
-        
         if (this.contadorJogadasSemParede_Modo2 == 1) {
             forcarCurvaDireita = true; 
             System.out.println("    > [MODO FINAL] CANTO DETETADO! A tentar curvar à direita relativa.");
         }
         
-        boolean ignoraManhattan = (haParedes || forcarCurvaDireita);
+        if (forcarCurvaDireita) ignoraManhattan = true;
         
-        
-        // --- Prioridades ---
         Movimiento target = this.direcaoGeralObjetivo;
         Movimiento contornoA = getContornoAntiHorario(target); 
         Movimiento contornoB = getContornoHorario(target);     
@@ -201,7 +181,7 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             ordemPrioridade.add(oposto);
         }
         
-        // System.out.println("  > [FINAL] IgnoraManhattan: " + ignoraManhattan);
+        System.out.println("  > [FINAL] IgnoraManhattan: " + ignoraManhattan + " | Forçar Curva: " + forcarCurvaDireita);
         
         Movimiento mejorMovimiento = null;
         double minCustoTotal = Double.MAX_VALUE;
@@ -267,18 +247,7 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
     }
 
 
-    // --- AJUDAS ---
-
-    private Movimiento getDireitaRelativa(Movimiento anterior) {
-        if (anterior == null) return Movimiento.QUEDARSE;
-        switch (anterior) {
-            case ARRIBA: return Movimiento.DERECHA;
-            case ABAJO: return Movimiento.IZQUIERDA;
-            case IZQUIERDA: return Movimiento.ARRIBA;
-            case DERECHA: return Movimiento.ABAJO;
-        }
-        return Movimiento.QUEDARSE;
-    }
+    // --- FUNÇÕES AUXILIARES ---
 
     private List<Movimiento> getMovimentosPossiveis(Percepcion p) {
         List<Movimiento> movimentosPossores = new ArrayList<>();
@@ -311,22 +280,33 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
         return (contagemCelula * PENALIDADE_CELULA) + (contagemAcao * PENALIDADE_ACAO);
     }
     
-    // CORREÇÃO: Atualiza o timer se houver paredes, independentemente do movimento
     private void atualizarTimer(boolean haParedes) {
         if (!haParedes) {
-            // Se sair da parede, reseta
             this.contadorJogadasNaParede = 0;
         } else {
-            // Se estiver na parede, incrementa SEMPRE (Reta ou Curva)
             this.contadorJogadasNaParede++;
-            
-            // Trava o contador para não dar overflow
             if (this.contadorJogadasNaParede > JOGADAS_NA_PAREDE_TOTAL) {
                  this.contadorJogadasNaParede = JOGADAS_NA_PAREDE_TOTAL + 1;
             }
         }
     }
     
+    // --- MÉTODO RESTAURADO ---
+    private void atualizarContadorParede_Modo2(boolean haParedes) {
+        this.pertoDaParede_Modo2 = haParedes;
+    }
+    
+    private Movimiento getDireitaRelativa(Movimiento anterior) {
+        if (anterior == null) return Movimiento.QUEDARSE;
+        switch (anterior) {
+            case ARRIBA: return Movimiento.DERECHA;
+            case ABAJO: return Movimiento.IZQUIERDA;
+            case IZQUIERDA: return Movimiento.ARRIBA;
+            case DERECHA: return Movimiento.ABAJO;
+        }
+        return Movimiento.QUEDARSE;
+    }
+
     private Movimiento calcularDirecaoGeral(Coordenada actual, Coordenada objetivo, Percepcion p) {
         int valorX = objetivo.getX() - actual.getX();
         int valorY = objetivo.getY() - actual.getY();
