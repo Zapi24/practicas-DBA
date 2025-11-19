@@ -14,6 +14,6 @@ public enum ResultadoAccion{    //Resultados que el entorno puede devolver tras 
     
     VICTORIA,
     OBSTACULO,
-    DERROTA_BATERIA, 
     MOVIMIENTO_VALIDO
 }
+
