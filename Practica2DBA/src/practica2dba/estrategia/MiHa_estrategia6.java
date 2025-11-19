@@ -11,34 +11,42 @@ import java.util.ArrayList;
 /**
  * @author zapi24 (Modificado com sugestão do user e IA)
  *
- * Nome da Estratégia: MiHa_estrategia6 (Corrigida)
+ * Nome da Estratégia: MiHa_estrategia6 (Timer Contínuo + Correções)
  *
- * Esta versão corrige o BUG que fazia reset aos "Checks"
- * (voltavam a 'false') no modo fail-safe.
+ * 1. MODO BUSCA (Longe):
+ * - Timer de 15 passos na parede.
+ * - CORREÇÃO: Conta jogadas na parede MESMO QUE HAJA CURVA.
+ * - Só reseta se largar a parede.
+ *
+ * 2. MODO FINAL (Perto, Raio 5):
+ * - Lógica de Prioridade.
+ * - Regra de Canto: Se sair da parede, tenta virar à direita na 1ª jogada.
  */
 public class MiHa_estrategia6 implements EstrategiaMovimiento {
 
-    // --- Penalizações (Modo Busca) ---
+    // --- Penalizações ---
     private static final int PENALIDADE_CELULA = 5; 
     private static final int PENALIDADE_ACAO = 10; 
     private static final int PENALIDADE_AFASTAR_PAREDE_MODOBUSCA = 1000;
-    
-    // --- Penalizações (Modo Final) ---
     private static final int PENALIDADE_AFASTAR_PAREDE_MODOFINAL = 1000;
     private static final int PENALIDADE_JA_PISADO_MODOFINAL = 200; 
     private static final int PENALIDADE_LOOP_MODOFINAL = 20; 
-
-    // --- Timer (só para MODO BUSCA) ---
-    private static final int JOGADAS_RETAS_NA_PAREDE = 17;
-    private int contadorJogadasRetasNaParede = 0;
     
-    // --- Raio (para MODO FINAL) ---
+    private static final int BONUS_CURVA_ESQUINA = -5000;
+
+    // --- Timer (Modo Busca) ---
+    private static final int JOGADAS_NA_PAREDE_TOTAL = 15; 
+    private int contadorJogadasNaParede = 0; // Contador contínuo
+    
+    // --- Raio (Modo Final) ---
     private static final int DISTANCIA_RAIO_FINAL = 5;
     private boolean modoFinalAtivado = false;
     private Movimiento direcaoGeralObjetivo = null;
-    private int contadorPertoDaParede_Modo2 = 0; 
     
-    // --- "Checks" (para MODO FINAL) ---
+    // --- Variável para a regra de Canto (Modo Final) ---
+    private int contadorJogadasSemParede_Modo2 = 0; 
+
+    // --- Checks (Modo Final) ---
     private boolean esquerdaCheck = false;
     private boolean direitaCheck = false;
     private int contadorOpostoEsquerda = 0;
@@ -58,14 +66,24 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
         Coordenada actual = p.getPosicionActual();
         double distAtual = calcularDistanciaManhattan(actual, objetivo);
 
-        // --- 1. VERIFICA O GATILHO DO MODO FINAL ---
-        if (!modoFinalAtivado && distAtual <= DISTANCIA_RAIO_FINAL) {
-            this.modoFinalAtivado = true;
-            this.direcaoGeralObjetivo = calcularDirecaoGeral(actual, objetivo, p);
-            this.mapaVisitas_ModoFinal.clear(); 
+        // 1. GATILHO MODO FINAL
+        boolean raioAux = (distAtual <= DISTANCIA_RAIO_FINAL);
+        if (!modoFinalAtivado && raioAux) {
+            Movimiento direcao = calcularDirecaoGeral(actual, objetivo, p);
+            boolean paredeEmFrente = false;
+            if (direcao == Movimiento.ARRIBA && p.getSensorMuro().get(Movimiento.ARRIBA)) paredeEmFrente = true;
+            else if (direcao == Movimiento.ABAJO && p.getSensorMuro().get(Movimiento.ABAJO)) paredeEmFrente = true;
+            else if (direcao == Movimiento.IZQUIERDA && p.getSensorMuro().get(Movimiento.IZQUIERDA)) paredeEmFrente = true;
+            else if (direcao == Movimiento.DERECHA && p.getSensorMuro().get(Movimiento.DERECHA)) paredeEmFrente = true;
+            
+            if (paredeEmFrente) {
+                this.modoFinalAtivado = true;
+                this.direcaoGeralObjetivo = direcao;
+                this.mapaVisitas_ModoFinal.clear();
+            }
         }
         
-        // --- 2. ATUALIZA AS MEMÓRIAS GLOBAIS ---
+        // 2. ATUALIZA MEMÓRIAS
         mapaDeVisitas_Celula.put(actual, mapaDeVisitas_Celula.getOrDefault(actual, 0) + 1);
         if (ultimoMovimientoDecidido != null && ultimaPosicao != null) { 
             HashMap<Movimiento, Integer> acoesDaUltimaPosicao = 
@@ -75,10 +93,9 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             mapaDeVisitas_Acao.put(ultimaPosicao, acoesDaUltimaPosicao);
         }
 
-        // --- 3. ESCOLHE O "CÉREBRO" ---
+        // 3. ESCOLHE CÉREBRO
         Movimiento mejorMovimiento;
-        
-        System.out.println("  > Raio Final Ativo (modoFinalAtivado): " + this.modoFinalAtivado);
+        System.out.println("  > Raio Final Ativo: " + this.modoFinalAtivado);
         
         if (modoFinalAtivado) {
             mejorMovimiento = decidirMovimento_ModoFinal(p, objetivo, actual);
@@ -86,27 +103,26 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             mejorMovimiento = decidirMovimento_ModoBusca(p, objetivo, actual);
         }
 
-        // --- 4. ATUALIZA O ESTADO (para a próxima jogada) ---
+        // 4. ATUALIZA ESTADO
         this.ultimaPosicao = actual;
         this.ultimoMovimientoDecidido = mejorMovimiento;
         return mejorMovimiento;
     }
 
 
-    /**
-     * CÉREBRO 1: MODO BUSCA (Lógica da "SUPERESTRATEGIA")
-     */
+    // --- MODO BUSCA ---
     private Movimiento decidirMovimento_ModoBusca(Percepcion p, Coordenada objetivo, Coordenada actual) {
-        
         List<Movimiento> movimentosPossores = getMovimentosPossiveis(p);
         if (movimentosPossores.isEmpty()) return Movimiento.QUEDARSE;
 
         boolean haParedes = haParedes(p);
         Movimiento mejorMovimiento = null;
         double minCustoTotal = Double.MAX_VALUE;
-        boolean podeSairDaParede = (contadorJogadasRetasNaParede > JOGADAS_RETAS_NA_PAREDE);
+        
+        // Verifica se o timer já excedeu o limite
+        boolean podeSairDaParede = (contadorJogadasNaParede > JOGADAS_NA_PAREDE_TOTAL);
 
-        System.out.println("  > [MODO BUSCA] A 'colar' à parede (Timer < 20): " + (!podeSairDaParede));
+        System.out.println("  > [BUSCA] Timer Parede: " + contadorJogadasNaParede + "/" + JOGADAS_NA_PAREDE_TOTAL + " (Pode Sair: " + podeSairDaParede + ")");
 
         for (Movimiento mov : movimentosPossores) {
             Coordenada futuraCord = calcularCoordenadaFutura(actual, mov);
@@ -128,28 +144,40 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             }
         }
         
-        atualizarTimer(haParedes, mejorMovimiento);
+        atualizarTimer(haParedes); // Atualização simplificada
         return mejorMovimiento;
     }
 
 
-    /**
-     * CÉREBRO 2: MODO FINAL (Lógica de Prioridade de Estado CORRIGIDA)
-     */
+    // --- MODO FINAL ---
     private Movimiento decidirMovimento_ModoFinal(Percepcion p, Coordenada objetivo, Coordenada actual) {
         
         boolean haParedes = haParedes(p);
-        atualizarContadorParede_Modo2(haParedes);
-        boolean ignoraManhattan = (this.contadorPertoDaParede_Modo2 > 0);
+
+        // --- LÓGICA DE CURVA DE CANTO ---
+        boolean forcarCurvaDireita = false;
         
-        // --- Define as prioridades baseado no estado (checkEsq, checkDir) ---
+        if (haParedes) {
+            this.contadorJogadasSemParede_Modo2 = 0; 
+        } else {
+            this.contadorJogadasSemParede_Modo2++; 
+        }
+        
+        if (this.contadorJogadasSemParede_Modo2 == 1) {
+            forcarCurvaDireita = true; 
+            System.out.println("    > [MODO FINAL] CANTO DETETADO! A tentar curvar à direita relativa.");
+        }
+        
+        boolean ignoraManhattan = (haParedes || forcarCurvaDireita);
+        
+        
+        // --- Prioridades ---
         Movimiento target = this.direcaoGeralObjetivo;
-        Movimiento contornoA = getContornoAntiHorario(target); // Esquerda
-        Movimiento contornoB = getContornoHorario(target);     // Direita
+        Movimiento contornoA = getContornoAntiHorario(target); 
+        Movimiento contornoB = getContornoHorario(target);     
         Movimiento oposto = getOposto(target);
         
         List<Movimiento> ordemPrioridade = new ArrayList<>();
-        
         if (!esquerdaCheck) {
             ordemPrioridade.add(target);
             ordemPrioridade.add(contornoA);
@@ -161,40 +189,27 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             ordemPrioridade.add(contornoA);
             ordemPrioridade.add(oposto);
         } else {
-            System.out.println("--- FALHA TOTAL. RESETANDO MEMÓRIA CURTA. ---");
+            System.out.println("--- FALHA TOTAL. RESETANDO. ---");
+            this.esquerdaCheck = false;
+            this.direitaCheck = false;
             this.contadorOpostoEsquerda = 0;
             this.contadorOpostoDireita = 0;
             this.mapaVisitas_ModoFinal.clear();
-            
             ordemPrioridade.add(target);
             ordemPrioridade.add(contornoA);
             ordemPrioridade.add(contornoB);
             ordemPrioridade.add(oposto);
         }
         
-        // --- DEBUG PRINT (Modo Final) ---
-        System.out.println("  > [MODO FINAL]");
-        System.out.println("    > A 'colar' à parede (Tolerância): " + ignoraManhattan + " (Contador: " + this.contadorPertoDaParede_Modo2 + ")");
-        System.out.println("    > Check Esquerda (Falhou): " + this.esquerdaCheck);
-        System.out.println("    > Check Direita (Falhou): " + this.direitaCheck);
-        System.out.println("    > Contagem Oposto (Esq): " + this.contadorOpostoEsquerda);
-        System.out.println("    > Contagem Oposto (Dir): " + this.contadorOpostoDireita);
-        // --- FIM DEBUG ---
+        // System.out.println("  > [FINAL] IgnoraManhattan: " + ignoraManhattan);
         
         Movimiento mejorMovimiento = null;
         double minCustoTotal = Double.MAX_VALUE;
-
-        HashMap<Movimiento, Integer> acoesDaPosicaoAtual = 
-            mapaDeVisitas_Acao.getOrDefault(actual, new HashMap<>());
-
+        HashMap<Movimiento, Integer> acoesDaPosicaoAtual = mapaDeVisitas_Acao.getOrDefault(actual, new HashMap<>());
         this.mapaVisitas_ModoFinal.put(actual, 1);
 
-        // Itera pela ordem de prioridade
         for (Movimiento mov : ordemPrioridade) {
-            
-            if (!p.getSensorLibre().get(mov)) {
-                continue;
-            }
+            if (!p.getSensorLibre().get(mov)) continue;
 
             Coordenada futuraCord = calcularCoordenadaFutura(actual, mov);
 
@@ -211,7 +226,15 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
                 custoParede = PENALIDADE_AFASTAR_PAREDE_MODOFINAL;
             }
 
-            double custoTotal = custoManhattan + custoVisitas + custoAcao + custoPrioridade + custoParede;
+            double custoCurva = 0;
+            if (forcarCurvaDireita) {
+                Movimiento direitaRelativa = getDireitaRelativa(this.ultimoMovimientoDecidido);
+                if (mov == direitaRelativa) {
+                    custoCurva = BONUS_CURVA_ESQUINA; 
+                }
+            }
+
+            double custoTotal = custoManhattan + custoVisitas + custoAcao + custoPrioridade + custoParede + custoCurva;
             
             if (custoTotal < minCustoTotal) {
                 minCustoTotal = custoTotal;
@@ -219,13 +242,9 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
             }
         }
         
-        if (mejorMovimiento == null) {
-            return Movimiento.QUEDARSE;
-        }
+        if (mejorMovimiento == null) return Movimiento.QUEDARSE;
 
-        // --- ATUALIZA OS CONTADORES DE ESTADO (Esquerda/Direita) ---
         if (mejorMovimiento == oposto) {
-            // Se o movimento é OPOSTO, incrementa o contador correto
             if (!esquerdaCheck) {
                 this.contadorOpostoEsquerda++;
                 if (this.contadorOpostoEsquerda > 10) {
@@ -240,18 +259,26 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
                 }
             }
         } else {
-            // *** A CORREÇÃO ESTÁ AQUI ***
-            // Se o movimento NÃO é oposto (é Target, Esq ou Dir),
-            // reseta AMBOS os contadores.
-            this.contadorOpostoEsquerda = 0;
-            this.contadorOpostoDireita = 0;
+            if (!esquerdaCheck) this.contadorOpostoEsquerda = 0;
+            if (!direitaCheck) this.contadorOpostoDireita = 0;
         }
 
         return mejorMovimiento;
     }
 
 
-    // --- FUNÇÕES DE AJUDA ---
+    // --- AJUDAS ---
+
+    private Movimiento getDireitaRelativa(Movimiento anterior) {
+        if (anterior == null) return Movimiento.QUEDARSE;
+        switch (anterior) {
+            case ARRIBA: return Movimiento.DERECHA;
+            case ABAJO: return Movimiento.IZQUIERDA;
+            case IZQUIERDA: return Movimiento.ARRIBA;
+            case DERECHA: return Movimiento.ABAJO;
+        }
+        return Movimiento.QUEDARSE;
+    }
 
     private List<Movimiento> getMovimentosPossiveis(Percepcion p) {
         List<Movimiento> movimentosPossores = new ArrayList<>();
@@ -284,26 +311,19 @@ public class MiHa_estrategia6 implements EstrategiaMovimiento {
         return (contagemCelula * PENALIDADE_CELULA) + (contagemAcao * PENALIDADE_ACAO);
     }
     
-    private void atualizarTimer(boolean haParedes, Movimiento mejorMovimiento) {
+    // CORREÇÃO: Atualiza o timer se houver paredes, independentemente do movimento
+    private void atualizarTimer(boolean haParedes) {
         if (!haParedes) {
-            this.contadorJogadasRetasNaParede = 0;
+            // Se sair da parede, reseta
+            this.contadorJogadasNaParede = 0;
         } else {
-            if (mejorMovimiento == this.ultimoMovimientoDecidido) {
-                this.contadorJogadasRetasNaParede++;
-            } else {
-                this.contadorJogadasRetasNaParede = 1;
+            // Se estiver na parede, incrementa SEMPRE (Reta ou Curva)
+            this.contadorJogadasNaParede++;
+            
+            // Trava o contador para não dar overflow
+            if (this.contadorJogadasNaParede > JOGADAS_NA_PAREDE_TOTAL) {
+                 this.contadorJogadasNaParede = JOGADAS_NA_PAREDE_TOTAL + 1;
             }
-            if (this.contadorJogadasRetasNaParede > JOGADAS_RETAS_NA_PAREDE) {
-                 this.contadorJogadasRetasNaParede = JOGADAS_RETAS_NA_PAREDE + 1;
-            }
-        }
-    }
-    
-    private void atualizarContadorParede_Modo2(boolean haParedes) {
-        if (haParedes) {
-            this.contadorPertoDaParede_Modo2 = 2; // (Trava em 2)
-        } else if (this.contadorPertoDaParede_Modo2 > 0) {
-            this.contadorPertoDaParede_Modo2--; // (Conta 2, 1, 0)
         }
     }
     
