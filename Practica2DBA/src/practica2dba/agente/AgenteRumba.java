@@ -1,25 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package practica2dba.agente;
 
-/**
- *
- * @author zapi24
- */
-
 import practica2dba.entorno.Entorno;
-import practica2dba.estrategia.EstrategiaManhattan;
-import practica2dba.estrategia.MiHa_estrategia6;
-import practica2dba.estrategia.EstrategiaZapi;
-import practica2dba.estrategia.EstrategiaNat;
-import practica2dba.estrategia.EstrategiaMovimiento;
+import practica2dba.estrategia.*;
 import practica2dba.interfaz.VentanaPrincipal;
-import practica2dba.utils.Coordenada;
-import practica2dba.utils.Movimiento;
-import practica2dba.utils.Percepcion;
-import practica2dba.utils.ResultadoAccion;
+import practica2dba.utils.*;
 
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -30,7 +14,7 @@ public class AgenteRumba extends Agent{
     private Entorno entorno;
     private Coordenada objetivo;
     private EstrategiaMovimiento estrategia;
-    private practica2dba.interfaz.VentanaPrincipal ventana;
+    private VentanaPrincipal ventana;
 
     
     @Override
@@ -40,7 +24,7 @@ public class AgenteRumba extends Agent{
 
         try{
             Object[] args = getArguments();
-            if (args != null && args.length == 5){  //Obtiene los argumentos asociados al agente
+            if (args != null && args.length == 6){  
                 
                 //Pos inicial
                 int x_ini = (int) args[0];
@@ -53,31 +37,23 @@ public class AgenteRumba extends Agent{
                 //Ruta del archivo del mapa
                 String rutaMapa = (String) args[4];
 
-                //Una vez obtenido todos los datos, define las variables del agente
+                // La ventana creada por el main
+                this.ventana = (VentanaPrincipal) args[5];
+
                 this.objetivo = new Coordenada(x_obj, y_obj);
                 this.entorno = new Entorno(rutaMapa, new Coordenada(x_ini, y_ini));
                 
+                // Estratedia elegida
                 this.estrategia = new EstrategiaNat();
-
-                // Crear interfaz gráfica
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    ventana = new VentanaPrincipal(
-                        entorno.getMundo().getMapa(),
-                        entorno.getPosicionActual(),
-                        objetivo
-                    );
-                });
-
 
                 System.out.println("Configuración: Inicio (" + x_ini + "," + y_ini + "), Objetivo (" + x_obj + "," + y_obj + ")");
                 System.out.println("Estrategia usada: " + estrategia.getClass().getSimpleName());
 
-                //Imrpimimos el estado icicial del mundo
+                //consola
                 System.out.println("\n--- MAPA INICIAL ---");
                 entorno.imprimirMundoActual();
 
-                //Vamos ejecutando el ciclo
-                addBehaviour(new TickerBehaviour(this, 100){
+                addBehaviour(new TickerBehaviour(this, 100){ 
                     @Override
                     protected void onTick() {
                         ejecutarCiclo();
@@ -85,12 +61,10 @@ public class AgenteRumba extends Agent{
                 });
 
             }else{
-                
-                System.err.println("Error: Argumentos incorrectos. (Se esperaban 5)");
+                System.err.println("Error: Argumentos incorrectos. (Se esperaban 6: x, y, ox, oy, mapa, ventana)");
                 doDelete();
             }
         }catch(Exception e){
-            
             System.err.println("Error en setup(): " + e.getMessage());
             e.printStackTrace();
             doDelete();
@@ -99,31 +73,32 @@ public class AgenteRumba extends Agent{
     
     private void ejecutarCiclo(){
         
-        //1. PERCEPCIÓN
+        //percepcion
         Percepcion percepcion = entorno.getPercepcionActual();
         
         System.out.println("-------------------------------------");
         System.out.println("Posición actual: " + percepcion.getPosicionActual());
 
-        //2. DECISIÓN (delegada a la Estrategia)
+        //decide
         Movimiento proximoMovimiento = estrategia.decidirMovimiento(percepcion, objetivo);
 
-        //3. ACCIÓN (delegada al Entorno)
+        //actua
         System.out.println("DECISIÓN: Mover -> " + proximoMovimiento);
         ResultadoAccion resultado = entorno.ejecutarAccion(proximoMovimiento);
-        // Actualizar interfaz con la nueva posición
-        if (ventana != null) {
+        
+        // actualiza el UI
+        if (this.ventana != null) {
+            // Usamos invokeLater para asegurar que tocamos la GUI desde el hilo correcto
             javax.swing.SwingUtilities.invokeLater(() -> {
-                ventana.actualizar(entorno.getPosicionActual());
+                this.ventana.actualizar(entorno.getPosicionActual());
             });
         }
 
 
-        //4. VALIDACIÓN
+        //comprueba
         switch (resultado){
             
             case VICTORIA:
-                //Comprobación de victoria (delegada al agente)
                 if (percepcion.getPosicionActual().equals(objetivo)) {
                     System.out.println("¡VICTORIA! Objetivo alcanzado en " + percepcion.getPosicionActual());
                     stopTicker(); // Detener el TickerBehaviour
@@ -131,14 +106,14 @@ public class AgenteRumba extends Agent{
                 break;
             case OBSTACULO:
                 
-                System.err.println("¡DERROTA! El agente intentó un movimiento inválido (obstáculo o límite).");
+                System.err.println("El agente intentó un movimiento inválido (obstáculo o límite).");
                 stopTicker();
                 break;
 
             case MOVIMIENTO_VALIDO:
                 
                 System.out.println("Acción ejecutada. Nueva posición: " + entorno.getPosicionActual());
-                //Comprobar victoria después de un movimiento válido para que no se piense el siguiente movimiento si ya ha ganado
+                //Comprobar victoria después de un movimiento válido
                 if (entorno.getPosicionActual().equals(objetivo)){
                     
                     System.out.println("¡VICTORIA! Objetivo alcanzado en " + entorno.getPosicionActual());
@@ -149,7 +124,7 @@ public class AgenteRumba extends Agent{
 
     }
 
-    //Metodo para detener al agente
+    //para detener al agente
     private void stopTicker(){
         
         System.out.println("Deteniendo el ciclo del agente...");
@@ -158,10 +133,15 @@ public class AgenteRumba extends Agent{
 
     @Override
     protected void takeDown(){
-        System.out.println("\n--- MAPA FINAL ---"); //Imprimimos el mapa final
+        System.out.println("\n--- MAPA FINAL ---");
         
         if (entorno != null){
             entorno.imprimirMundoActual();
+        }
+        
+        //para poder ejecutar varias veces desde la UI
+        if (this.ventana != null) {
+            this.ventana.habilitarControles();
         }
         
         System.out.println("Agente " + getAID().getLocalName() + " terminando.");
