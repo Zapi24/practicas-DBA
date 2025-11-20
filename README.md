@@ -168,11 +168,14 @@ Estrategia avanzada con dos modos según distancia al objetivo:
    ```
 2. Ejecutar el programa.
 3. Se mostrará la interfaz principal con:
+<img width="567" height="556" alt="Ejecucion1" src="https://github.com/user-attachments/assets/eb164e1a-6db1-48c0-a6d5-8196ac074d51" />
 
    * Agente (círculo azul)
    * Objetivo (cuadrado verde)
    * Obstáculos (cuadrados negros)
    * Casillas visitadas (cuadrados amarillos)
+
+<img width="491" height="480" alt="Ejecucion2" src="https://github.com/user-attachments/assets/c9a345db-dd73-40d8-8a3b-6fc31d79f257" />
 
 ### 🎛️ Configuración
 
@@ -188,6 +191,7 @@ Al terminar, se mostrará:
 
 * Energía consumida
 * Camino recorrido
+
 
 
 
