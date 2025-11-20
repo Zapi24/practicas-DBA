@@ -189,16 +189,7 @@ Al terminar, se mostrará:
 * Energía consumida
 * Camino recorrido
 
----
 
-## Conclusiones y mejoras futuras
-
-* Las estrategias logran llegar al objetivo con bajo consumo energético.
-* EstrategiaNat es consistente, con consumos < 1000 en todos los mapas.
-* Mejoras futuras:
-
-  * Evitar que el agente borde muros innecesariamente cuando cree falsos atascos.
-  * Optimizar aún más la detección de estructuras convexas y cóncavas.
 
 
 
