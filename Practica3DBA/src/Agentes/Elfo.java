@@ -22,7 +22,7 @@ public class Elfo extends Agent {
                 String content = msg.getContent();
 
                 //mensaje del agente nuestro a santa
-                if (sender.equals("procurador")) {
+                if (sender.equals("busqueda")) {
                     String inner = content.replace("Bro", "")
                             .replace("En Plan", "").trim();
 
@@ -40,7 +40,7 @@ public class Elfo extends Agent {
                             .trim();
 
                     ACLMessage back = new ACLMessage(ACLMessage.INFORM);
-                    back.addReceiver(getAID("procurador"));
+                    back.addReceiver(getAID("bursqueda"));
                     back.setContent("Bro " + inner + " En Plan");
                     send(back);
                     return;
