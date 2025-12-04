@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
  *
  * @author zapi24
  */
-public class Mundo{ //Clase que cartga el mundo y almacena syu estado 
+public class Mundo{ //Clase que carga el mundo y almacena su estado 
     
     private int filas;
     private int columnas;
