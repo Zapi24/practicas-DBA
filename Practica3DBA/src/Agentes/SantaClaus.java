@@ -11,7 +11,7 @@ public class SantaClaus extends Agent {
 
     @Override
     protected void setup() {
-        System.out.println("Santa Claus ready!");
+        System.out.println("Santa Claus esta pronto!");
         addBehaviour(new SantaBehaviour(this));
     }
 
@@ -34,7 +34,7 @@ public class SantaClaus extends Agent {
 
             //la mensaje que recibe debe ser: Rakas Joulupukki ... Kiitos
             if (!content.startsWith("Rakas Joulupukki") || !content.endsWith("Kiitos")) {
-                System.out.println("Santa received malformed message from " + sender);
+                System.out.println("Santa Claus recibio una mensaje mal formatada de " + sender);
                 return;
             }
 
@@ -49,9 +49,9 @@ public class SantaClaus extends Agent {
                     boolean trustworthy = rand.nextDouble() < 0.8;
 
                     if (!trustworthy) {
-                        reply.setContent("Hyvää joulua REJECT Nähdään pian");
+                        reply.setContent("Hyvää joulua RECHAZADO Nähdään pian");
                         myAgent.send(reply);
-                        System.out.println("Santa rechazou el voluntário.");
+                        System.out.println("Santa Claus rechazo el voluntário.");
                         return;
                     }
 
@@ -66,7 +66,7 @@ public class SantaClaus extends Agent {
                     reply.setContent("Hyvää joulua SANTA_X:10,SANTA_Y:5 Nähdään pian");
                     myAgent.send(reply);
                     return;
-                }
+                }//10
                 case "LLEGO" -> {
                     reply.setContent("Hyvää joulua HoHoHo! Nähdään pian");
                     myAgent.send(reply);
