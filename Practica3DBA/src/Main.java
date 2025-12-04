@@ -8,36 +8,36 @@ public class Main {
     public static void main(String[] args) {
 
         try {
-            // Start JADE runtime
+
             Runtime rt = Runtime.instance();
             rt.setCloseVM(true);
 
-            // Create a main container with GUI
+            //create a main container with GUI
             Profile p = new ProfileImpl();
             p.setParameter(Profile.GUI, "true");
             ContainerController mainContainer = rt.createMainContainer(p);
 
-            // Launch Santa
+            //launch Santa
             AgentController santa = mainContainer.createNewAgent(
-                    "santa", "SantaClausAgent", null);
+                    "santa", "SantaClaus", null);
             santa.start();
 
-            // Launch the Translator
+            //launch the Translator
             AgentController elf = mainContainer.createNewAgent(
-                    "elf", "ElfTranslatorAgent", null);
+                    "elf", "Elfo", null);
             elf.start();
 
-            // Launch Rudolph
+            //launch Rudolph
             AgentController rudolph = mainContainer.createNewAgent(
                     "rudolph", "Rudolph", null);
             rudolph.start();
 
-            // Launch Searcher agent
+            //launch  our Agent
             AgentController searcher = mainContainer.createNewAgent(
                     "procurador", "AgenteNuestro", null);
             searcher.start();
 
-            // Launch GUI agent (optional)
+            //launch GUI agent
             AgentController ui = mainContainer.createNewAgent(
                     "ui",
                     "GUIAgent",
