@@ -34,7 +34,7 @@ public class AgenteNuestro extends Agent {
             ACLMessage reply = blockingReceive();
             String inner = reply.getContent().replace("Bro", "").replace("En Plan", "").trim();
 
-            if (inner.startsWith("REJECT")) {
+            if (inner.startsWith("RECHAZADO")) {
                 System.out.println("Santa nos rechazou. A salir...");
                 myAgent.doDelete();
                 return;
@@ -56,10 +56,11 @@ public class AgenteNuestro extends Agent {
             send(init);
 
             ACLMessage reply = blockingReceive();
-            System.out.println("Rudolph aceptou coneccion");
+            System.out.println("Rudolph acepto coneccion");
         }
     }
 
+    //5 y 6
     private class CollectReindeer extends jade.core.behaviours.Behaviour {
 
         @Override
@@ -72,7 +73,7 @@ public class AgenteNuestro extends Agent {
             ACLMessage reply = blockingReceive();
             String content = reply.getContent();
 
-            if (content.equals("NO_MORE_REINDEER")) {
+            if (content.equals("Ja encontramos todos los renos!")) {
                 System.out.println("Todos los renos fueron encontrados!");
                 doneFlag = true;
                 return;
@@ -89,6 +90,7 @@ public class AgenteNuestro extends Agent {
         }
     }
 
+    //8 pedir ubicacion
     private class GoToSanta extends jade.core.behaviours.OneShotBehaviour {
         @Override
         public void action() {
@@ -110,4 +112,3 @@ public class AgenteNuestro extends Agent {
         }
     }
 }
-
