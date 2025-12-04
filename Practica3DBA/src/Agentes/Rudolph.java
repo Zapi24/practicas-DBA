@@ -14,7 +14,7 @@ public class Rudolph extends Agent {
 
     @Override
     protected void setup() {
-        System.out.println("🦌 Rudolph ready!");
+        System.out.println("Rudolph esta pronto!");
 
         addBehaviour(new jade.core.behaviours.CyclicBehaviour(this) {
             @Override
@@ -40,7 +40,7 @@ public class Rudolph extends Agent {
                 if (!content.equals("GET_NEXT")) return;
 
                 ACLMessage reply = msg.createReply();
-
+                //review
                 if (index < renos.length) {
                     reply.setContent(renos[index++] + "_X:" + (index*3) + ",Y:" + (index*2));
                 } else {
@@ -52,4 +52,3 @@ public class Rudolph extends Agent {
         });
     }
 }
-
