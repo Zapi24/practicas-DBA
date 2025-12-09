@@ -197,25 +197,24 @@ public class AgenteNuestro extends Agent {
     //-----------------------------------------------------------------------
     //PASO 4: Volver a casa (Santa)
     //-----------------------------------------------------------------------
-private class GoToSanta extends OneShotBehaviour {
+    private class GoToSanta extends OneShotBehaviour {
         @Override
-        public void action() {
+        public void action(){
             if (abortMission) return;
 
             System.out.println("\n--- PASO 4: Regreso a casa ---");
-            // Pedimos permiso/ubi (aunque ya sabemos que es 0,0 por el txt, seguimos protocolo)
             ACLMessage ask = new ACLMessage(ACLMessage.REQUEST);
             ask.addReceiver(new AID("elf", AID.ISLOCALNAME));
             ask.setContent("Bro PEDIR_LOCALIZACION_SANTA_CLAUS En Plan");
             send(ask);
-            blockingReceive(); // Esperamos respuesta formal
+            blockingReceive(); //Esperamos respuesta 
 
             System.out.println("[BUSCADOR] Volviendo al origen (0,0)...");
             
-            // --- NAVEGACIÓN REAL A CASA ---
+            //Navegacion a casa
             navegarHacia(POSICION_SANTA);
 
-            // Saludo final
+            //Saludo final
             ACLMessage arrived = new ACLMessage(ACLMessage.INFORM);
             arrived.addReceiver(new AID("elf", AID.ISLOCALNAME));
             arrived.setContent("Bro LLEGO En Plan");
@@ -248,9 +247,6 @@ private class GoToSanta extends OneShotBehaviour {
                 System.err.println("   [ERROR] ¡Choque contra muro! Revisa la estrategia.");
                 break; //Evitar bucle infinito si se atasca
             }
-            
-            //Pequeña pausa para simular tiempo de viaje y no saturar CPU
-            //try { Thread.sleep(20); } catch (InterruptedException e) {}
         }
     }
 }
