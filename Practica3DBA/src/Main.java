@@ -29,14 +29,12 @@ public class Main {
                     "elf", "Agentes.Elfo", null);
             elf.start();
 
-            // 3. RUDOLPH (Añadido paquete Agentes.)
-            // Opcional: Aquí podrías pasar las coordenadas como argumentos en lugar de null
-            // si quisieras quitar el array hardcodeado de Rudolph.
+            //3. RUDOLPH (Añadido paquete Agentes.)
             AgentController rudolph = mainContainer.createNewAgent(
                     "rudolph", "Agentes.Rudolph", null);
             rudolph.start();
 
-            // 4. NUESTRO AGENTE 
+            //4. NUESTRO AGENTE 
             AgentController searcher = mainContainer.createNewAgent(
                     "buscador", "Agentes.AgenteNuestro", null);
             searcher.start();

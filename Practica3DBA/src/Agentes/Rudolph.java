@@ -9,6 +9,9 @@ public class Rudolph extends Agent {
     //Lista de los nombres de los renos a rescatar
     private String[] renos = {"Dasher", "Dancer", "Vixen", "Prancer", "Cupid", "Comet", "Blitzen", "Donner"};
 
+    
+    //COORDENADAS DE CADA UNO DE LOS RENOS, si cambian hay que modificar este vector
+    private String[] coordsRenos = {"11,12", "19,41", "41,60", "52,33", "63,34", "66,56", "92,74", "95,10"};
     private int index = 0;
     
     //Guardamos el código de la sesión actual
@@ -81,11 +84,14 @@ public class Rudolph extends Agent {
                      ACLMessage reply = msg.createReply();
                      reply.setPerformative(ACLMessage.INFORM);
                      
-                     if(index < renos.length){
-                         
-                        reply.setContent(renos[index++] + "_X:" + (index*10) + ",Y:" + (index*5));
+                    if(index < renos.length){
+                        
+                        //Formato: NOMBRE_X,Y (Para que el agente lo parseé fácil). Ejemplo: Dasher_11,12
+                        String payload = renos[index] + "_" + coordsRenos[index];
+                        reply.setContent(payload);
+                        index++;
                      }else{
-                         
+                        
                         reply.setContent("FIN");
                      }
                      send(reply);
