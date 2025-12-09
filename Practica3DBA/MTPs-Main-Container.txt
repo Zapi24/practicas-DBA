@@ -1,1 +1,1 @@
-http://172.17.3.3:7778/acc
+http://zapi24-GF63-Thin-9SC:7778/acc

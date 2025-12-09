@@ -1,0 +1,35 @@
+Mapa sin obstáculos
+
+Coordenadas renos:
+* 5,7
+* 11,71
+* 23,39
+* 42,61
+* 46,17
+* 59,39
+* 86,84
+* 90,4
+
+Coordenadas Santa:
+* 0,0
+
+Coordenadas iniciales agente:
+* 99,99
+
+Mapa con obstáculos
+
+Coordenadas renos:
+* 11,12
+* 19,41
+* 41,60
+* 52,33
+* 63,34
+* 66,56
+* 92,74
+* 95,10
+
+Coordenadas Santa:
+* 0,0
+
+Coordenadas iniciales agente:
+* 99,99
