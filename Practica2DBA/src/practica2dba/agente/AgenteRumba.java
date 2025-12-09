@@ -53,7 +53,7 @@ public class AgenteRumba extends Agent{
                 System.out.println("\n--- MAPA INICIAL ---");
                 entorno.imprimirMundoActual();
 
-                addBehaviour(new TickerBehaviour(this, 200){ 
+                addBehaviour(new TickerBehaviour(this, 100){ 
                     @Override
                     protected void onTick() {
                         ejecutarCiclo();
