@@ -10,8 +10,12 @@ public class Rudolph extends Agent {
     private String[] renos = {"Dasher", "Dancer", "Vixen", "Prancer", "Cupid", "Comet", "Blitzen", "Donner"};
 
     
-    //COORDENADAS DE CADA UNO DE LOS RENOS, si cambian hay que modificar este vector
-    private String[] coordsRenos = {"11,12", "19,41", "41,60", "52,33", "63,34", "66,56", "92,74", "95,10"};
+    //Posiciones de los renos para el mapa 100x100
+    //private String[] coordsRenos = {"11,12", "19,41", "41,60", "52,33", "63,34", "66,56", "92,74", "95,10"};
+    
+    // Posiciones de los renos para el mapa 20x20
+    private String[] coordsRenos = {"1,1", "18,2", "11,4", "7,8", "15,10", "3,14", "10,17", "17,18"}; 
+    
     private int index = 0;
     
     //Guardamos el código de la sesión actual
@@ -58,7 +62,7 @@ public class Rudolph extends Agent {
 
                     // Comprobamos si el código coincide con el que nos dio Santa
                     if(codigo != null && codigo.equals(codigo)){
-                        
+                        index = 0;
                         System.out.println("[RUDOLPH] Código correcto. Aceptando misión.");
                         ACLMessage respuesta = msg.createReply();
                         respuesta.setPerformative(ACLMessage.AGREE);    //Performativa de agree
