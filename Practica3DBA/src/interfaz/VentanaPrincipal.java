@@ -25,6 +25,7 @@ public class VentanaPrincipal extends JFrame {
     // Componentes visuales
     private GridMapPanel panel;
     private JLabel lblEstado; 
+    private ChatPanel chatPanel;
     
     // posiciones y mapas
     private JComboBox<String> cmbMapas;
@@ -60,6 +61,10 @@ public class VentanaPrincipal extends JFrame {
         scroll.setPreferredSize(new Dimension(800, 600));
         scroll.getVerticalScrollBar().setUnitIncrement(16); 
         add(scroll, BorderLayout.CENTER);
+        
+        chatPanel = new ChatPanel();
+        chatPanel.setPreferredSize(new Dimension(400, 0)); //Ancho fijo de 350px
+        add(chatPanel, BorderLayout.EAST); //Posicionarlo a la derecha
 
         lblEstado = new JLabel("Estado: Configura el mapa y lanza la misión.", SwingConstants.CENTER);
         lblEstado.setFont(new Font("Arial", Font.BOLD, 14));
@@ -101,9 +106,11 @@ public class VentanaPrincipal extends JFrame {
             containerRef = rt.createMainContainer(p);
 
             // Agentes 
-            containerRef.createNewAgent("santa", "Agentes.SantaClaus", null).start();
-            containerRef.createNewAgent("elf", "Agentes.Elfo", null).start();
-            containerRef.createNewAgent("rudolph", "Agentes.Rudolph", null).start();
+            Object[] args = new Object[]{ this }; 
+
+            containerRef.createNewAgent("santa", "Agentes.SantaClaus", args).start();
+            containerRef.createNewAgent("elf", "Agentes.Elfo", args).start();
+            containerRef.createNewAgent("rudolph", "Agentes.Rudolph", args).start();
             
             System.out.println("Agentes Santa, Elfo y Rudolph iniciados correctamente.");
             lblEstado.setText("Agentes permanentes listos. Introduce la posición inicial del Buscador.");
@@ -293,5 +300,14 @@ public class VentanaPrincipal extends JFrame {
         SwingUtilities.invokeLater(() -> {
             panel.setPosicionSanta(posSanta);
         });
+    }
+    
+    //Método que llamarán los agentes
+    public void agregarMensajeChat(String emisor, String mensaje) {
+        if (chatPanel != null) {
+            SwingUtilities.invokeLater(() -> {
+                chatPanel.mandarMensaje(emisor, mensaje);
+            });
+        }
     }
 }

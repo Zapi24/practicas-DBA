@@ -5,10 +5,21 @@ import jade.core.AID; //LIBRERIA necesaria para el paso de mensajes
 import jade.lang.acl.ACLMessage;
 import jade.core.behaviours.CyclicBehaviour;
 
+import interfaz.VentanaPrincipal;
+
 public class Elfo extends Agent {
+    
+    //Variable para guardar la ventana
+    private VentanaPrincipal gui;
 
     @Override
     protected void setup() {
+        
+        Object[] args = getArguments();
+        if (args != null && args.length > 0 && args[0] instanceof VentanaPrincipal) {
+            this.gui = (VentanaPrincipal) args[0];
+        }
+        
         System.out.println("El elfo traductor está listo y está escuchandoá...");
 
         //Implementamos un comportamiento cíclico.
@@ -47,6 +58,10 @@ public class Elfo extends Agent {
                     //3. Añadimos el el contenido en Finlandes, que sigficia: "Querido Santa ... Gracias"
                     forward.setContent("Rakas Joulupukki " + contenidoMsg + " Kiitos");
                     
+                    if (gui != null) {
+                        gui.agregarMensajeChat("Elfo", "Traducido de Buscador a Santa: \"" + contenidoMsg + "\"");
+                    }
+                    
                     send(forward);
                     return;
                 }
@@ -66,6 +81,10 @@ public class Elfo extends Agent {
                     
                     // 3. Añadimos la jerga juvenil: "Bro ... En Plan"
                     back.setContent("Bro " + contenidoMsg + " En Plan");
+                    
+                    if (gui != null) {
+                        gui.agregarMensajeChat("Elfo", "Traducido de Santa a Buscador: \"" + contenidoMsg + "\"");
+                    }
                     
                     send(back);
                     return;

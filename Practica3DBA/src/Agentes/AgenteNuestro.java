@@ -102,6 +102,8 @@ public class AgenteNuestro extends Agent {
         @Override
         public void action(){
             if (abortMission) return;
+            
+            if(gui != null) gui.agregarMensajeChat("Buscador", "Enviando solicitud de misión al Elfo (para Santa).");
 
             System.out.println("--- PASO 1: Solicitando audiencia con Santa ---");
             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
@@ -148,6 +150,8 @@ public class AgenteNuestro extends Agent {
         public void action(){
             
             if (abortMission) return;
+            
+            if(gui != null) gui.agregarMensajeChat("Buscador", "Iniciando protocolo de seguridad con Rudolph (Código: " + secretCode + ")");
 
             System.out.println("--- PASO 2: Conectando con Rudolph ---");
             ACLMessage init = new ACLMessage(ACLMessage.REQUEST);
@@ -184,6 +188,8 @@ public class AgenteNuestro extends Agent {
                 doneFlag = true; 
                 return; 
             }
+            
+            if(gui != null) gui.agregarMensajeChat("Buscador", "Solicitando ubicación del siguiente reno a Rudolph.");
 
             //1. Pedir coordenada
             ACLMessage req = new ACLMessage(ACLMessage.REQUEST);
@@ -225,6 +231,7 @@ public class AgenteNuestro extends Agent {
             // Actualizar GUI para borrar el reno del mapa
             if (gui != null) {
                 gui.renoRescatado(objetivoReno); 
+                gui.agregarMensajeChat("Buscador", "¡He rescatado a " + nombreReno + "! Informando al Elfo.");
             }
 
             ACLMessage msgSanta = new ACLMessage(ACLMessage.INFORM);
@@ -247,6 +254,8 @@ public class AgenteNuestro extends Agent {
         public void action(){
             if (abortMission) return;
 
+            if(gui != null) gui.agregarMensajeChat("Buscador", "Misión cumplida. Solicitando coordenadas de regreso al Elfo.");
+            
             System.out.println("\n--- PASO 4: Regreso a casa ---");
             ACLMessage ask = new ACLMessage(ACLMessage.REQUEST);
             ask.addReceiver(new AID("elf", AID.ISLOCALNAME));
@@ -283,6 +292,8 @@ public class AgenteNuestro extends Agent {
             ACLMessage arrived = new ACLMessage(ACLMessage.INFORM);
             arrived.addReceiver(new AID("elf", AID.ISLOCALNAME));
             arrived.setContent("Bro LLEGO En Plan");
+            
+            if(gui != null) gui.agregarMensajeChat("Buscador", "He llegado a la base. Enviando saludo final.");
             send(arrived);
             
             ACLMessage finalReply = blockingReceive();

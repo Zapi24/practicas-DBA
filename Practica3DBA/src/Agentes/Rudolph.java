@@ -4,6 +4,8 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.core.behaviours.CyclicBehaviour;
 
+import interfaz.VentanaPrincipal;
+
 public class Rudolph extends Agent {
 
     //Lista de los nombres de los renos a rescatar
@@ -20,9 +22,16 @@ public class Rudolph extends Agent {
     
     //Guardamos el código de la sesión actual
     private String codigo = null;
+    
+    private VentanaPrincipal gui;
 
     @Override
     protected void setup(){
+        
+        Object[] args = getArguments();
+        if (args != null && args.length > 0 && args[0] instanceof VentanaPrincipal) {
+            this.gui = (VentanaPrincipal) args[0];
+        }
         
         System.out.println("Rudolph está listo en el establo.");
 
@@ -67,6 +76,8 @@ public class Rudolph extends Agent {
                         ACLMessage respuesta = msg.createReply();
                         respuesta.setPerformative(ACLMessage.AGREE);    //Performativa de agree
                         respuesta.setContent("ACCEPT");
+                        
+                        if(gui != null) gui.agregarMensajeChat("Rudolph", "Código correcto. Aceptando conexión segura con Buscador.");
                         send(respuesta);
                         
                     }else{
@@ -75,6 +86,8 @@ public class Rudolph extends Agent {
                         ACLMessage respuesta = msg.createReply();
                         respuesta.setPerformative(ACLMessage.REFUSE);   //Performatica de Refuse
                         respuesta.setContent("CODIGO_INVALIDO");
+                        
+                        if(gui != null) gui.agregarMensajeChat("Rudolph", "¡ALERTA! Código incorrecto. Rechazando conexión.");
                         send(respuesta);
                     }
                     return;
@@ -93,10 +106,14 @@ public class Rudolph extends Agent {
                         //Formato: NOMBRE_X,Y (Para que el agente lo parseé fácil). Ejemplo: Dasher_11,12
                         String payload = renos[index] + "_" + coordsRenos[index];
                         reply.setContent(payload);
+                        
+                        if(gui != null) gui.agregarMensajeChat("Rudolph", "Enviando coordenadas de " + renos[index] + " al Buscador.");
                         index++;
                      }else{
                         
                         reply.setContent("FIN");
+                        
+                        if(gui != null) gui.agregarMensajeChat("Rudolph", "No quedan más renos. Enviando señal FIN.");
                      }
                      send(reply);
                 }
